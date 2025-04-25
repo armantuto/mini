@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Condimenti - Scadenze</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      padding-top: 50px;
+    }
+    .card {
+      margin-top: 20px;
+    }
+    .autocomplete-suggestions {
+      position: absolute;
+      border: 1px solid #ccc;
+      max-height: 200px;
+      overflow-y: auto;
+      background-color: white;
+      width: 100%;
+      z-index: 1000;
+    }
+    .autocomplete-suggestion {
+      padding: 8px;
+      cursor: pointer;
+    }
+    .autocomplete-suggestion:hover {
+      background-color: #f1f1f1;
+    }
+    .highlighted {
+      background-color: #d1e7dd; /* Colore di evidenziazione */
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1 class="text-center mb-4">Gestione Condimenti</h1>
+
+  <!-- Barra di ricerca -->
+  <div class="mb-3 position-relative">
+    <label for="searchInput" class="form-label">Cerca un condimento</label>
+    <input type="text" id="searchInput" class="form-control" placeholder="Cerca condimenti..." />
+    <div id="suggestions" class="autocomplete-suggestions"></div>
+  </div>
+
+  <div id="result"></div>
+</div>
+
+<script>
+  const condimenti = {
+    "cheddar": {
+      nome: "Formaggio Cheddar",
+      info: " in contenitore scadenza 24 ore; avvolto con pellicola 72 ore "
+    },
+    "prosciutto cotto": {
+      nome: "Prosciutto Cotto",
+      info: "scongelamento 24 ore, mantenimento 48 ore, utilizzo 4 ore (totale 72 ore)"
+    },
+    "bites": {
+      nome: "bacon bites",
+      info: "scongelamento 12 ore, mantenimento 60 ore, ambientamento 1 ora e utilizzo 5 ore (totale 72 ore)"
+    },
+    "bacon": {
+      nome: "bacon",
+      info: "scongelamento 12 ore, mantenimento 48 ore, ambientamento 1 ora utilizzo 5 ore (totale 60 ore)"
+    },
+    "bacon plant based": {
+      nome: "bacon plant based",
+      info: "scongelamento 12 ore, mantenimento 60 ore,ambientanento 1 ora utilizzo 3 ore (totale 72 ore)"
+    },
+    "pomodori": {
+      nome: "pomodori",
+      info: "tagliati e sanificati 12 ore"
+    },
+    "insalata": {
+      nome: "insalata",
+      info: "sanificata e tagliata 24 ore"
+    },
+    "cipolle": {
+      nome: "cipolle ",
+      info: "sanificata e tagliata 24 ore"
+    },
+    "cetrioli": {
+      nome: " cetrioli",
+      info: "mantenimento 48 ore, utilizzo 24 ore"
+    },
+    "jalapenos": {
+      nome: " jalapenos",
+      info: "mantenimento 30 giorni, ambientamento 2h utilizzo fine giornata"
+    },
+    "maionese": {
+      nome: "maionese",
+      info: "scadenza 48 ore"
+    },
+    "senape": {
+      nome: "senape",
+      info: "in busta originale aperta 9 settimane, in botiglia 24 ore"
+    },
+    "ketchup": {
+      nome: "ketchup",
+      info: "in busta originale aperta 14 giorni, in botiglia 24 ore"
+    },
+    "barbecue": {
+      nome: "barbecue",
+      info: "busta aperta 4 giorni, ambientamento 2h utilizzo 46 ore, totale 48 ore"
+    },
+    "king": {
+      nome: "king",
+      info: "mantenimento 4 giorni, utilizo 4 ore"
+    },
+    "cipolle crispy": {
+      nome: "cipolle crispy",
+      info: "busta aperta sigilata 14 giorni, in utilizzo 8 ore"
+    },
+    "parmigiano scaglie": {
+      nome: "parmigiano scaglie",
+      info: "busta aperta, in gastronorm 24 ore, utilizzo 4 ore"
+    },
+    "songino": {
+      nome: "songino",
+      info: "busta aperta 24 ore, ambientamento 1 ora, utilizzo 3 ore"
+    },
+    "rucola": {
+      nome: "rucola",
+      info: "busta aperta 24 ore, ambientamento 1 ora, utilizzo 3 ore"
+    },
+    "cipolle fresche fritte": {
+      nome: "cipolle fresche fritte",
+      info: "friggere per 1 minuto a 182 gradi, utilizzo 4 ore"
+
+    },   
+    "bbq bull eye cotto": {
+      nome: "bbq bull eye cotto",
+      info: "busta originale aperta 7 giorni,  ambientamento 2 ore, utilizzo 22 ore"
+    },
+    "salsa al formaggio": {
+      nome: "salsa al formaggio",
+      info: "mantenimento 72 ore, ambientamento 2 ore, utilizo 2 ore"
+    },
+    "mayo al parmigiano": {
+      nome: "mayo al parmigiano",
+      info: " mantenimento 48 ore, ambientamento 2 ore, utilizzo 10 ore"
+    },
+    "smoked sauce": {
+      nome: "smoked sauce",
+      info: "mantenimento 48 ore, ambientamento 2 ore utilizzo 10 ore"
+    },
+    "mais": {
+      nome: "mais",
+      info: "in contenitore 48 ore"
+    },
+    "pomodori cigielino": {
+      nome: "pomodori cigielino",
+      info: "sanificati e tagliati 24 ore"
+    },
+    "scamorza bianca": {
+      nome: "scamorza bianca",
+      info: "mantenimento 24 ore, utilizzo 4 ore"
+    },
+    " asiago a fette": {
+      nome: "asiago a fette",
+      info: "mantenimento 24 ore, utilizzo 4 ore"
+    },
+    "mix sale pepe": {
+      nome: "mix sale e pepe",
+      info: "busta aperta 60 giorni."
+    },
+    
+   
+  };
+
+  const searchInput = document.getElementById("searchInput");
+  const suggestionsDiv = document.getElementById("suggestions");
+  const resultDiv = document.getElementById("result");
+
+  let selectedSuggestion = null; // Traccia l'elemento selezionato
+
+  // Filtro dei condimenti in base alla ricerca
+  searchInput.addEventListener("input", () => {
+    const searchText = searchInput.value.toLowerCase();
+    const filteredCondimenti = Object.keys(condimenti).filter(key => 
+      condimenti[key].nome.toLowerCase().includes(searchText)
+    );
+    
+    suggestionsDiv.innerHTML = ""; // Pulisce i suggerimenti
+    selectedSuggestion = null; // Resetta la selezione
+
+    if (searchText.length > 0) {
+      // Mostra i suggerimenti
+      filteredCondimenti.forEach(key => {
+        const suggestion = document.createElement("div");
+        suggestion.classList.add("autocomplete-suggestion");
+        suggestion.textContent = condimenti[key].nome;
+
+        // Aggiungi click listener per mostrare i dettagli del condimento
+        suggestion.addEventListener("click", () => {
+          showCondimentoDetails(key);
+          highlightSuggestion(suggestion);
+        });
+
+        // Aggiungi mouseover per evidenziare la selezione
+        suggestion.addEventListener("mouseover", () => {
+          if (selectedSuggestion) {
+            selectedSuggestion.classList.remove("highlighted");
+          }
+          suggestion.classList.add("highlighted");
+          selectedSuggestion = suggestion;
+        });
+
+        suggestionsDiv.appendChild(suggestion);
+      });
+    }
+  });
+
+  // Funzione per evidenziare il condimento selezionato
+  function highlightSuggestion(suggestion) {
+    suggestion.classList.add("highlighted");
+  }
+
+  // Funzione per mostrare i dettagli del condimento
+  function showCondimentoDetails(key) {
+    const c = condimenti[key];
+    resultDiv.innerHTML = `
+      <div class="card">
+        <div class="card-body">
+          <h2 class="card-title center"> <strong>${c.nome}</strong></h2>
+          <p><strong>Informazione: ${c.info}</strong></p>
+        
+        </div>
+      </div>
+    `;
+    suggestionsDiv.innerHTML = ""; // Nasconde i suggerimenti dopo la selezione
+  }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
